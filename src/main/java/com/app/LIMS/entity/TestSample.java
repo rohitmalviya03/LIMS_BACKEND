@@ -61,6 +61,22 @@ public class TestSample {
 	}
 	private String notes;
     private String status;
-    private LocalDateTime createdAt;
+    private Long createdBy;
+    
+    private String createbyUser;
+    
+    public String getCreatebyUser() {
+		return createbyUser;
+	}
+	public void setCreatebyUser(String createbyUser) {
+		this.createbyUser = createbyUser;
+	}
+	public Long getCreatedBy() {
+		return createdBy;
+	}
+	public void setCreatedBy(Long createdBy) {
+		this.createdBy = createdBy;
+	}
+	private LocalDateTime createdAt;
     // getters/setters
 }
