@@ -1,12 +1,15 @@
 package com.app.LIMS.Controller;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -116,4 +120,92 @@ public class TestController {
         return counts;
     }
     
+    @PostMapping("/addtests/bulk")
+    public ResponseEntity<?> raiseBulkTests(@RequestBody TestRaiseRequest req) {
+        Optional<Patient> patientOpt = patientRepo.findById(req.getPatientId());
+        if (!patientOpt.isPresent()) return ResponseEntity.status(404).body("Patient not found");
+
+        // Prepare for sample number generation
+        String dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String prefix = "LAB-" + dateStr + "-";
+
+        // Find the last sample number for today
+        Optional<TestSample> lastSampleOpt = sampleRepo.findTopBySampleNumberStartingWithOrderBySampleNumberDesc(prefix);
+        int nextNum = 1;
+        if (lastSampleOpt.isPresent()) {
+            String lastSampleNum = lastSampleOpt.get().getSampleNumber();
+            String[] parts = lastSampleNum.split("-");
+            nextNum = Integer.parseInt(parts[2]) + 1;
+        }
+
+        List<String> sampleNumbers = new ArrayList<>();
+        List<Long> sampleIds = new ArrayList<>();
+
+        for (TestRaiseRequest.TestItem testItem : req.getTests()) {
+            String sampleNumber = prefix + String.format("%04d", nextNum++);
+
+            TestSample sample = new TestSample();
+            sample.setSampleNumber(sampleNumber);
+            sample.setPatient(patientOpt.get());
+            sample.setTestName(testItem.getTestName());
+            sample.setCreatedBy(req.getTestRaisedBy());
+            sample.setNotes(req.getNotes());
+            sample.setStatus("Pending");
+            sample.setCreatedAt(LocalDateTime.now());
+            sampleRepo.save(sample);
+
+            sampleNumbers.add(sampleNumber);
+            sampleIds.add(sample.getId());
+        }
+
+        return ResponseEntity.ok(Map.of(
+            "success", true,
+            "sampleNumbers", sampleNumbers,
+            "sampleIds", sampleIds
+        ));
+    }
+    
+	/*
+	 * @PutMapping("/raisedtests/{id}") public ResponseEntity<?> editRaisedTest(
+	 * 
+	 * @PathVariable Long id,
+	 * 
+	 * @RequestBody TestRaiseRequest req) { Optional<TestSample> sampleOpt =
+	 * sampleRepo.findById(id); if (sampleOpt.isEmpty()) return
+	 * ResponseEntity.status(404).body("Sample not found");
+	 * 
+	 * TestSample sample = sampleOpt.get();
+	 * 
+	 * if (req.getTestName() != null) sample.setTestName(req.getTestName()); if
+	 * (req.getNotes() != null) sample.setNotes(req.getNotes()); // Add more fields
+	 * as needed (status, etc.)
+	 * 
+	 * sampleRepo.save(sample);
+	 * 
+	 * return ResponseEntity.ok(Map.of( "success", true, "message",
+	 * "Test updated successfully" )); }
+	 */
+    @GetMapping("/raisedtests")
+    public ResponseEntity<?> getRaisedTests(@RequestParam Long patientId) {
+        List<TestSample> list = sampleRepo.findByPatientId(patientId);
+        return ResponseEntity.ok(list);
+    }
+
+    // Edit a raised test (test name, notes)
+    @PutMapping("/raisedtests/{id}")
+    public ResponseEntity<?> editRaisedTest(@PathVariable Long id, @RequestBody TestRaiseRequest req) {
+        Optional<TestSample> sampleOpt = sampleRepo.findById(id);
+        if (sampleOpt.isEmpty()) return ResponseEntity.status(404).body("Sample not found");
+
+        TestSample sample = sampleOpt.get();
+        if (req.getTestName() != null && !req.getTestName().trim().isEmpty()) sample.setTestName(req.getTestName());
+        if (req.getNotes() != null) sample.setNotes(req.getNotes());
+       // sample.setUpdatedAt(LocalDateTime.now());
+        sampleRepo.save(sample);
+
+        return ResponseEntity.ok(Map.of(
+            "success", true,
+            "message", "Test updated successfully"
+        ));
+    }
 }

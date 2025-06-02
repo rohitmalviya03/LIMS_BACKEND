@@ -68,6 +68,12 @@ public class TestSample {
     public String getCreatebyUser() {
 		return createbyUser;
 	}
+	public boolean isBilled() {
+		return billed;
+	}
+	public void setBilled(boolean billed) {
+		this.billed = billed;
+	}
 	public void setCreatebyUser(String createbyUser) {
 		this.createbyUser = createbyUser;
 	}
@@ -77,6 +83,8 @@ public class TestSample {
 	public void setCreatedBy(Long createdBy) {
 		this.createdBy = createdBy;
 	}
+	 private boolean billed = false;
+
 	private LocalDateTime createdAt;
     // getters/setters
 }

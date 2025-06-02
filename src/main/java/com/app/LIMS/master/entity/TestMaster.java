@@ -11,26 +11,38 @@ import jakarta.persistence.Table;
 public class TestMaster {
     @Id @GeneratedValue
     private Long id;
+
     @Column(unique = true, nullable = false)
     private String testName;
+
     private String description;
+
+    @Column(nullable = false)
+    private Double price; // <--- Add this field
+
     // getters/setters
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getTestName() {
-		return testName;
-	}
-	public void setTestName(String testName) {
-		this.testName = testName;
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public String getTestName() {
+        return testName;
+    }
+    public void setTestName(String testName) {
+        this.testName = testName;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    public Double getPrice() {
+        return price;
+    }
+    public void setPrice(Double price) {
+        this.price = price;
+    }
 }

@@ -12,4 +12,5 @@ public interface TestSampleRepository extends JpaRepository<TestSample, Long> {
     Optional<TestSample> findTopBySampleNumberStartingWithOrderBySampleNumberDesc(String prefix);
     List<TestSample> findByStatusIgnoreCase(String status);
     long countByStatusIgnoreCase(String status);
+	List<TestSample> findByPatientId(Long patientId);
 }

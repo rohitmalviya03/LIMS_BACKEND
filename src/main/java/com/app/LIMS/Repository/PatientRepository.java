@@ -1,3 +1,4 @@
+
 package com.app.LIMS.Repository;
 
 import java.util.List;
@@ -11,5 +12,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     boolean existsByMrn(String mrn);
     long count();
     Optional<Patient> findByMrn(String mrn);
+    
+ 
    
 }
