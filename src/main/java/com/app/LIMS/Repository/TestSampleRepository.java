@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.app.LIMS.entity.Sample;
 import com.app.LIMS.entity.TestSample;
 
 public interface TestSampleRepository extends JpaRepository<TestSample, Long> {
@@ -13,5 +14,7 @@ public interface TestSampleRepository extends JpaRepository<TestSample, Long> {
     List<TestSample> findByStatusIgnoreCase(String status);
     long countByStatusIgnoreCase(String status);
 	List<TestSample> findByPatientId(Long patientId);
+	
+	 TestSample findBySampleNumber(String sampleId);
 	//List<TestSample> findByStatusIgnoreCase(String status);
 }

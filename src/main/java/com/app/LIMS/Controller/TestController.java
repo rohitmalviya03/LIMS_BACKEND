@@ -121,6 +121,7 @@ public class TestController {
         counts.put("all", testRepo.count());
         counts.put("pending", testRepo.countByStatusIgnoreCase("pending"));
         counts.put("completed", testRepo.countByStatusIgnoreCase("completed"));
+        counts.put("collected", testRepo.countByStatusIgnoreCase("collected"));
         counts.put("running", testRepo.countByStatusIgnoreCase("running"));
         return counts;
     }
