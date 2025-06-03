@@ -25,10 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.app.LIMS.Dto.TestRaiseRequest;
 import com.app.LIMS.Repository.PatientRepository;
+import com.app.LIMS.Repository.SampleRepository;
 import com.app.LIMS.Repository.TestSampleRepository;
 import com.app.LIMS.Repository.UserRepository;
 import com.app.LIMS.Services.TestService;
 import com.app.LIMS.entity.Patient;
+import com.app.LIMS.entity.Sample;
 import com.app.LIMS.entity.User;
 import com.app.LIMS.entity.TestSample;
 
@@ -37,8 +39,11 @@ import com.app.LIMS.entity.TestSample;
 @RequestMapping("/api")
 public class TestController {
     @Autowired private PatientRepository patientRepo;
-    @Autowired private TestSampleRepository sampleRepo;
+    @Autowired private TestSampleRepository testRepo;
     @Autowired private UserRepository userRepo;
+    
+    @Autowired SampleRepository sampleRepo;
+   
     @Autowired
     private TestService testService;
 
@@ -65,7 +70,7 @@ public class TestController {
         // Generate sample number
         String dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String prefix = "LAB-" + dateStr + "-";
-        Optional<TestSample> lastSampleOpt = sampleRepo.findTopBySampleNumberStartingWithOrderBySampleNumberDesc(prefix);
+        Optional<TestSample> lastSampleOpt = testRepo.findTopBySampleNumberStartingWithOrderBySampleNumberDesc(prefix);
         int nextNum = 1;
         if (lastSampleOpt.isPresent()) {
             String lastSampleNum = lastSampleOpt.get().getSampleNumber();
@@ -82,7 +87,7 @@ public class TestController {
         sample.setNotes(req.getNotes());
         sample.setStatus("Pending");
         sample.setCreatedAt(LocalDateTime.now());
-        sampleRepo.save(sample);
+        testRepo.save(sample);
 
         return ResponseEntity.ok(Map.of(
             "success", true,
@@ -98,7 +103,7 @@ public class TestController {
     }
     @GetMapping("/tests/{id}")
     public ResponseEntity<TestSample> getTestById(@PathVariable Long id) {
-        Optional<TestSample> test = sampleRepo.findById(id);
+        Optional<TestSample> test = testRepo.findById(id);
         User ab= userRepo.findById(test.get().getCreatedBy());
         if(ab!=null) {
         test.get().setCreatebyUser(ab.getUsername());
@@ -113,10 +118,10 @@ public class TestController {
     @GetMapping("/tests/count")
     public Map<String, Long> getTestCounts() {
         Map<String, Long> counts = new HashMap<>();
-        counts.put("all", sampleRepo.count());
-        counts.put("pending", sampleRepo.countByStatusIgnoreCase("pending"));
-        counts.put("completed", sampleRepo.countByStatusIgnoreCase("completed"));
-        counts.put("running", sampleRepo.countByStatusIgnoreCase("running"));
+        counts.put("all", testRepo.count());
+        counts.put("pending", testRepo.countByStatusIgnoreCase("pending"));
+        counts.put("completed", testRepo.countByStatusIgnoreCase("completed"));
+        counts.put("running", testRepo.countByStatusIgnoreCase("running"));
         return counts;
     }
     
@@ -130,7 +135,7 @@ public class TestController {
         String prefix = "LAB-" + dateStr + "-";
 
         // Find the last sample number for today
-        Optional<TestSample> lastSampleOpt = sampleRepo.findTopBySampleNumberStartingWithOrderBySampleNumberDesc(prefix);
+        Optional<TestSample> lastSampleOpt = testRepo.findTopBySampleNumberStartingWithOrderBySampleNumberDesc(prefix);
         int nextNum = 1;
         if (lastSampleOpt.isPresent()) {
             String lastSampleNum = lastSampleOpt.get().getSampleNumber();
@@ -145,6 +150,7 @@ public class TestController {
             String sampleNumber = prefix + String.format("%04d", nextNum++);
 
             TestSample sample = new TestSample();
+            Sample sC = new Sample();
             sample.setSampleNumber(sampleNumber);
             sample.setPatient(patientOpt.get());
             sample.setTestName(testItem.getTestName());
@@ -152,8 +158,17 @@ public class TestController {
             sample.setNotes(req.getNotes());
             sample.setStatus("Pending");
             sample.setCreatedAt(LocalDateTime.now());
-            sampleRepo.save(sample);
+            testRepo.save(sample);
 
+            
+            sC.setPatientId(patientOpt.get().getId());
+            sC.setPatientName(patientOpt.get().getFirstName());
+            sC.setSampleId(sampleNumber);
+            sC.setCollector(String.valueOf(req.getTestRaisedBy()));
+            sC.setTests(testItem.getTestName());
+            sC.setStatus("Pending");
+            
+            sampleRepo.save(sC);
             sampleNumbers.add(sampleNumber);
             sampleIds.add(sample.getId());
         }
@@ -171,7 +186,7 @@ public class TestController {
 	 * @PathVariable Long id,
 	 * 
 	 * @RequestBody TestRaiseRequest req) { Optional<TestSample> sampleOpt =
-	 * sampleRepo.findById(id); if (sampleOpt.isEmpty()) return
+	 * testRepo.findById(id); if (sampleOpt.isEmpty()) return
 	 * ResponseEntity.status(404).body("Sample not found");
 	 * 
 	 * TestSample sample = sampleOpt.get();
@@ -180,28 +195,28 @@ public class TestController {
 	 * (req.getNotes() != null) sample.setNotes(req.getNotes()); // Add more fields
 	 * as needed (status, etc.)
 	 * 
-	 * sampleRepo.save(sample);
+	 * testRepo.save(sample);
 	 * 
 	 * return ResponseEntity.ok(Map.of( "success", true, "message",
 	 * "Test updated successfully" )); }
 	 */
     @GetMapping("/raisedtests")
     public ResponseEntity<?> getRaisedTests(@RequestParam Long patientId) {
-        List<TestSample> list = sampleRepo.findByPatientId(patientId);
+        List<TestSample> list = testRepo.findByPatientId(patientId);
         return ResponseEntity.ok(list);
     }
 
     // Edit a raised test (test name, notes)
     @PutMapping("/raisedtests/{id}")
     public ResponseEntity<?> editRaisedTest(@PathVariable Long id, @RequestBody TestRaiseRequest req) {
-        Optional<TestSample> sampleOpt = sampleRepo.findById(id);
+        Optional<TestSample> sampleOpt = testRepo.findById(id);
         if (sampleOpt.isEmpty()) return ResponseEntity.status(404).body("Sample not found");
 
         TestSample sample = sampleOpt.get();
         if (req.getTestName() != null && !req.getTestName().trim().isEmpty()) sample.setTestName(req.getTestName());
         if (req.getNotes() != null) sample.setNotes(req.getNotes());
        // sample.setUpdatedAt(LocalDateTime.now());
-        sampleRepo.save(sample);
+        testRepo.save(sample);
 
         return ResponseEntity.ok(Map.of(
             "success", true,

@@ -13,4 +13,5 @@ public interface TestSampleRepository extends JpaRepository<TestSample, Long> {
     List<TestSample> findByStatusIgnoreCase(String status);
     long countByStatusIgnoreCase(String status);
 	List<TestSample> findByPatientId(Long patientId);
+	//List<TestSample> findByStatusIgnoreCase(String status);
 }
