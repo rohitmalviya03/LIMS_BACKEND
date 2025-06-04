@@ -46,8 +46,8 @@ public class SampleController {
     public Sample collectSample(@RequestBody Map<String, Object> req) {
         String sampleId = (String) req.get("sampleId");
         String collector = (String) req.get("collector");
-        String collectedAtStr = (String) req.get("collectedAt");
-        LocalDateTime collectedAt = LocalDateTime.parse(collectedAtStr);
+       // String collectedAtStr = (String) req.get("collectedAt");
+        LocalDateTime collectedAt =null;// LocalDateTime.parse(collectedAtStr);
         return sampleService.collectSample(sampleId, collector, collectedAt);
     }
 
@@ -66,18 +66,22 @@ public class SampleController {
     }
     
     
-    
-    @PutMapping("/{sampleId}/status")
-    public Sample updateSampleStatus(
-            @PathVariable Long sampleId,
-            @RequestBody StatusUpdateRequest request
-    ) {
-        return sampleService.updateSampleStatus(sampleId, request.getStatus());
+    @PutMapping("/status")
+    public Sample updateSampleStatus(@RequestBody StatusUpdateRequest request) {
+        return sampleService.updateSampleStatus(request.getSampleId(), request.getStatus());
     }
 
     // DTO for status update
     public static class StatusUpdateRequest {
-        private String status;
+    	  private String sampleId;  // Add this field
+    	    public String getSampleId() {
+			return sampleId;
+		}
+		public void setSampleId(String sampleId) {
+			this.sampleId = sampleId;
+		}
+			private String status;
+       
         public String getStatus() { return status; }
         public void setStatus(String status) { this.status = status; }
     }
