@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -16,7 +18,18 @@ public class TestMaster {
     private String testName;
 
     private String description;
+    @ManyToOne
+    @JoinColumn(name = "sample_id")
+    private SampleMaster sample; // Reference to Sample Master
 
+
+    public SampleMaster getSample() {
+		return sample;
+	}
+
+	public void setSample(SampleMaster sample) {
+		this.sample = sample;
+	}
     @Column(nullable = false)
     private Double price; // <--- Add this field
 

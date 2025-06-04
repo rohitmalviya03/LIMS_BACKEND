@@ -1,8 +1,5 @@
 package com.app.LIMS.master.Controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.app.LIMS.master.Repository.*;
 import com.app.LIMS.master.entity.*;
 
@@ -12,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/masters")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class MasterController {
 
     @Autowired private TestMasterRepository testRepo;
@@ -29,6 +27,7 @@ public class MasterController {
     @PutMapping("/tests/{id}")
     public TestMaster updateTest(@PathVariable Long id, @RequestBody TestMaster test) {
         test.setId(id);
+        
         return testRepo.save(test);
     }
 
@@ -83,4 +82,3 @@ public class MasterController {
     @DeleteMapping("/machine-params/{id}")
     public void deleteParam(@PathVariable Long id) { paramRepo.deleteById(id); }
 }
-

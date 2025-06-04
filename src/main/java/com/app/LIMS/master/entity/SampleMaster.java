@@ -11,8 +11,10 @@ public class SampleMaster {
 
     @Column(unique = true, nullable = false)
     private String type;
+    
 
-    public Long getId() {
+
+	public Long getId() {
 		return id;
 	}
 

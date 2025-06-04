@@ -12,9 +12,12 @@ import com.app.LIMS.entity.TestSample;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 @RestController
 @RequestMapping("/api/samples")
@@ -65,12 +68,19 @@ public class SampleController {
         return sampleService.getCollectedSamples(date, status);
     }
     
+    @GetMapping("/processed")
+    public List<Sample> getProcessedSamples() {
+        return sampletesrepo.findByStatus("processed");
+    }
     
+ 
     @PutMapping("/status")
     public Sample updateSampleStatus(@RequestBody StatusUpdateRequest request) {
         return sampleService.updateSampleStatus(request.getSampleId(), request.getStatus());
     }
 
+    
+    
     // DTO for status update
     public static class StatusUpdateRequest {
     	  private String sampleId;  // Add this field
