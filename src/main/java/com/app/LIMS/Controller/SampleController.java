@@ -2,6 +2,7 @@ package com.app.LIMS.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.app.LIMS.Repository.SampleRepository;
@@ -105,5 +106,31 @@ public class SampleController {
         counts.put("collected", sampletesrepo.countByStatusIgnoreCase("collected"));
         counts.put("running", sampletesrepo.countByStatusIgnoreCase("running"));
         return counts;
+    }
+    
+ // Get tests for a sample (for result entry)
+    @GetMapping("/{id}/tests")
+    public List<TestSample> getTestsForSample(@PathVariable Long id) {
+        Optional<Sample> sampleOpt = sampletesrepo.findById(id);
+        if (sampleOpt.isPresent()) {
+            Sample sample = sampleOpt.get();
+            if (sample.getTests() != null && !sample.getTests().isEmpty()) {
+                List<Long> testIds = java.util.Arrays.stream(sample.getTests().split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .map(Long::parseLong)
+                        .toList();
+                return sampleRepo.findAllById(testIds);
+            }
+        }
+        return List.of();
+    }
+    
+ // Get sample by sample number (for result entry search)
+    @GetMapping("/by-number/{sampleNumber}")
+    public ResponseEntity<?> getSampleByNumber(@PathVariable String sampleNumber) {
+        Optional<Sample> sampleOpt = sampletesrepo.findBySampleId(sampleNumber);
+        return sampleOpt.<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

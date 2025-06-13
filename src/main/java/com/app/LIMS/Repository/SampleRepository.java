@@ -21,4 +21,6 @@ public interface SampleRepository extends JpaRepository<Sample, Long> {
     @Query("SELECT s FROM Sample s WHERE (:status IS NULL OR s.status = :status) AND DATE(s.collectedAt) = DATE(:date)")
     List<Sample> findByStatusAndDate(String status, LocalDateTime date);
     long countByStatusIgnoreCase(String status);
+    
+    
 }

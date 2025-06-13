@@ -1,13 +1,18 @@
 package com.app.LIMS.Controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.app.LIMS.Repository.UserRepository;
 import com.app.LIMS.Services.UserService;
 import com.app.LIMS.entity.User;
 import com.app.LIMS.entity.UserRequest;
@@ -23,7 +28,14 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private UserRepository userRepo;
+    
 
+    
+    
+    
     @PostMapping("/login")
     public ResponseEntity<UserDTO> login(@RequestBody LoginRequest loginRequest) {
         return userService.authenticate(loginRequest.getUsername(), loginRequest.getPassword())
@@ -31,6 +43,19 @@ public class UserController {
                 .orElse(ResponseEntity.status(401).build());
     }
 
+    
+    
+
+    @GetMapping("/users-master")
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userRepo.findAll();
+        List<User> dtos = users.stream()
+            .map(u -> new User(u.getId(),u.getUsername(),u.getRole()))
+            .toList();
+        return ResponseEntity.ok(dtos);
+    }
+    
+  
    @PostMapping("/add")
     public ResponseEntity<?> addUser(@RequestBody UserRequest userRequest) {
         try {

@@ -12,8 +12,14 @@ public class TestRaiseRequest {
     
     public static class TestItem {
         private String testName;
-
-        // Getters and setters
+        private String testId;
+        public String getTestId() {
+			return testId;
+		}
+		public void setTestId(String testId) {
+			this.testId = testId;
+		}
+		// Getters and setters
         public String getTestName() { return testName; }
         public void setTestName(String testName) { this.testName = testName; }
     }

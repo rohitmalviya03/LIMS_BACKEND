@@ -17,4 +17,7 @@ public interface TestSampleRepository extends JpaRepository<TestSample, Long> {
 	
 	 TestSample findBySampleNumber(String sampleId);
 	//List<TestSample> findByStatusIgnoreCase(String status);
+	 
+
+List<TestSample> findAllById(Iterable<Long> ids);
 }

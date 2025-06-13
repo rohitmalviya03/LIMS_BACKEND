@@ -98,7 +98,7 @@ public class TestController {
     
     @GetMapping("/teststatus")
     public List<TestSample> getTests(@RequestParam(value = "status", required = false) String status) {
-    	testService.getTestsByStatus(status);
+    	List<TestSample> li=testService.getTestsByStatus(status);
         return testService.getTestsByStatus(status);
     }
     @GetMapping("/tests/{id}")
@@ -154,7 +154,7 @@ public class TestController {
             Sample sC = new Sample();
             sample.setSampleNumber(sampleNumber);
             sample.setPatient(patientOpt.get());
-            sample.setTestName(testItem.getTestName());
+            sample.setTestName(testItem.getTestId());
             sample.setCreatedBy(req.getTestRaisedBy());
             sample.setNotes(req.getNotes());
             sample.setStatus("Pending");
@@ -166,7 +166,7 @@ public class TestController {
             sC.setPatientName(patientOpt.get().getFirstName());
             sC.setSampleId(sampleNumber);
             sC.setCollector(String.valueOf(req.getTestRaisedBy()));
-            sC.setTests(testItem.getTestName());
+            sC.setTests(testItem.getTestId());
             sC.setStatus("Pending");
             
             sampleRepo.save(sC);

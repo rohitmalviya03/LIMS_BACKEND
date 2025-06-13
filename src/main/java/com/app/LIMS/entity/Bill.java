@@ -69,7 +69,9 @@ public class Bill {
 	public void setItemsJson(String itemsJson) {
 		this.itemsJson = itemsJson;
 	}
-
+	private boolean paid = false;
+	public boolean isPaid() { return paid; }
+	public void setPaid(boolean paid) { this.paid = paid; }
 	private LocalDateTime date = LocalDateTime.now();
 
     private Double discountPercent;

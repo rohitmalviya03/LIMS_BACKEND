@@ -3,6 +3,7 @@ package com.app.LIMS.Controller;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,14 +18,30 @@ import com.app.LIMS.entity.Bill;
 import com.app.LIMS.entity.Patient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import okhttp3.OkHttpClient;
+import okhttp3.*;
+import okhttp3.MediaType;
+
+
+import org.json.JSONObject;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
+
+import okhttp3.Credentials;
 @RestController
+
 @RequestMapping("/api/bills")
 public class BillController {
     private final BillRepository billRepo;
     private final PatientRepository patientRepo;
     private final TestSampleRepository raisedTestRepo;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String RAZORPAY_KEY = "YOUR_KEY_ID";
+    private final String RAZORPAY_SECRET = "YOUR_SECRET_KEY";
 
+    
+    
     public BillController(BillRepository billRepo, PatientRepository patientRepo, TestSampleRepository raisedTestRepo) {
         this.billRepo = billRepo;
         this.patientRepo = patientRepo;
@@ -72,5 +89,41 @@ public class BillController {
         return billRepo.findByPatient(patient);
     }
     
-    
+    //payment
+   
+
+    // 2. Verify Razorpay Payment and Update Bill
+    @PostMapping("/razorpay/verify")
+    public ResponseEntity<?> verifyRazorpayPayment(@RequestBody Map<String, Object> data) {
+        String razorpayOrderId = (String) data.get("razorpay_order_id");
+        String razorpayPaymentId = (String) data.get("razorpay_payment_id");
+        String razorpaySignature = (String) data.get("razorpay_signature");
+        Long billId = Long.valueOf(data.get("billId").toString());
+
+        // Signature verification
+        String payload = razorpayOrderId + "|" + razorpayPaymentId;
+        String actualSignature;
+        try {
+            Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secret_key = new SecretKeySpec(RAZORPAY_SECRET.getBytes(), "HmacSHA256");
+            sha256_HMAC.init(secret_key);
+            byte[] hash = sha256_HMAC.doFinal(payload.getBytes());
+            actualSignature = new String(Base64.getEncoder().encode(hash));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Signature verification failed");
+        }
+
+        if (!actualSignature.equals(razorpaySignature)) {
+            return ResponseEntity.status(400).body("Invalid signature");
+        }
+
+        // Mark bill as paid
+        billRepo.findById(billId).ifPresent(bill -> {
+            bill.setPaid(true);
+            billRepo.save(bill);
+        });
+
+        return ResponseEntity.ok("Payment verified and bill updated");
+    }
+
 }

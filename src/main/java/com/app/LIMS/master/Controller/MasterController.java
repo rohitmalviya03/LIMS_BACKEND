@@ -1,11 +1,14 @@
 package com.app.LIMS.master.Controller;
 
+import com.app.LIMS.Dto.TestWithParamsDTO;
 import com.app.LIMS.master.Repository.*;
 import com.app.LIMS.master.entity.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/masters")
@@ -20,6 +23,10 @@ public class MasterController {
     // --- Test Master ---
     @GetMapping("/tests")
     public List<TestMaster> getTests() { return testRepo.findAll(); }
+
+    
+    @GetMapping("/tests/{id}")
+    public Optional<TestMaster> getTests(@PathVariable Long id) { return testRepo.findById(id); }
 
     @PostMapping("/tests")
     public TestMaster addTest(@RequestBody TestMaster test) { return testRepo.save(test); }
@@ -70,6 +77,14 @@ public class MasterController {
     @GetMapping("/machine-params")
     public List<MachineParameterTestMaster> getParams() { return paramRepo.findAll(); }
 
+    @GetMapping("/machine-test-params")
+    public List<MachineParameterTestMaster> getParamsByTestId(@RequestParam(required = false) Long testId) {
+        if (testId != null) {
+            return paramRepo.findByTestId(testId);
+        } else {
+            return paramRepo.findAll();
+        }
+    }
     @PostMapping("/machine-params")
     public MachineParameterTestMaster addParam(@RequestBody MachineParameterTestMaster param) { return paramRepo.save(param); }
 
@@ -81,4 +96,19 @@ public class MasterController {
 
     @DeleteMapping("/machine-params/{id}")
     public void deleteParam(@PathVariable Long id) { paramRepo.deleteById(id); }
+
+ 
+    @GetMapping("/tests-with-params")
+    public List<TestWithParamsDTO> getTestsWithParams() {
+        List<TestMaster> tests = testRepo.findAll();
+        List<MachineParameterTestMaster> allParams = paramRepo.findAll();
+
+        return tests.stream().map(test -> {
+            List<MachineParameterTestMaster> paramsForTest = allParams.stream()
+                .filter(param -> param.getId().equals(test.getId()))
+                .collect(Collectors.toList());
+            return new TestWithParamsDTO(test.getId(), test.getTestName(), paramsForTest);
+        }).collect(Collectors.toList());
+    }
+
 }

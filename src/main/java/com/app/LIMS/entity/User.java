@@ -13,7 +13,18 @@ import java.time.LocalDateTime;
 @Setter
 @Table(name = "users")
 public class User {
-    @Id
+    public User(Integer id, String username, String role) {
+		super();
+		this.id = id;
+		this.username = username;
+		this.role = role;
+	}
+
+	public User() {
+		// TODO Auto-generated constructor stub
+	}
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "UserID")
     private Integer id;

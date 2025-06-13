@@ -17,7 +17,17 @@ public class TestSample {
     @ManyToOne
     private Patient patient;
     private String testName;
-    public Long getId() {
+    
+    
+    private Long testId;
+    
+    public Long getTestId() {
+		return testId;
+	}
+	public void setTestId(Long testId) {
+		this.testId = testId;
+	}
+	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
