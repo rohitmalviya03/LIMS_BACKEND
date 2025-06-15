@@ -3,6 +3,7 @@ package com.app.LIMS.Services;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,8 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
 
+	 	@Value("${labCode}")
+	    private String labCode;
     public Optional<User> authenticate(String username, String rawPassword) {
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isPresent()) {
@@ -41,6 +44,7 @@ public class UserService {
     public User addUser(UserRequest userRequest) {
         User user = new User();
         user.setUsername(userRequest.getUsername());
+        user.setLabcode(userRequest.getLabcode());
         user.setPasswordHash(passwordEncoder.encode(userRequest.getPassword()));
         user.setEmail(userRequest.getEmail());
         user.setRole(userRequest.getRole());

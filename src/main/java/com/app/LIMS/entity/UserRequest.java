@@ -1,5 +1,7 @@
 package com.app.LIMS.entity;
 
+import jakarta.persistence.Column;
+
 public class UserRequest {
     private String username;
     private String password;
@@ -28,6 +30,17 @@ public class UserRequest {
 	}
 	public void setRole(String role) {
 		this.role = role;
+	}
+    @Column(nullable = true)
+    private String labcode; // <-- Added labcode field
+
+
+    public String getLabcode() {
+		return labcode;
+	}
+
+	public void setLabcode(String labcode) {
+		this.labcode = labcode;
 	}
 
     // getters and setters

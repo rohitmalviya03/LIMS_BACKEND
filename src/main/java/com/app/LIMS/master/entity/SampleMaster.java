@@ -37,7 +37,17 @@ public class SampleMaster {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+    @Column(nullable = true)
+    private String labcode; // <-- Added labcode field
 
+
+    public String getLabcode() {
+		return labcode;
+	}
+
+	public void setLabcode(String labcode) {
+		this.labcode = labcode;
+	}
 	private String description;
 
     // getters and setters

@@ -20,4 +20,8 @@ public interface TestSampleRepository extends JpaRepository<TestSample, Long> {
 	 
 
 List<TestSample> findAllById(Iterable<Long> ids);
+
+List<TestSample> findByStatusIgnoreCaseAndLabcode(String status, String labcode);
+List<TestSample> findAllByIdInAndLabcode(List<Long> ids, String labcode);
+
 }

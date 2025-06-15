@@ -96,5 +96,17 @@ public class TestSample {
 	 private boolean billed = false;
 
 	private LocalDateTime createdAt;
+	
+    @Column(nullable = true)
+    private String labcode; // <-- Added labcode field
+
+
+    public String getLabcode() {
+		return labcode;
+	}
+
+	public void setLabcode(String labcode) {
+		this.labcode = labcode;
+	}
     // getters/setters
 }

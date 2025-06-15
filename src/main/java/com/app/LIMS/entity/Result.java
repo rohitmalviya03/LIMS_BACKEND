@@ -1,7 +1,5 @@
 package com.app.LIMS.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.*;
 
 @Entity
@@ -35,9 +33,28 @@ public class Result {
     private TestSample test;
 
     private String value;
+    
+    private Long patMrn;
 
-    // Add this field to support parameterized results
+    public Long getPatMrn() {
+		return patMrn;
+	}
+	public void setPatMrn(Long patMrn) {
+		this.patMrn = patMrn;
+	}
+	// Add this field to support parameterized results
     private String parameter;
+    @Column(nullable = true)
+    private String labcode; // <-- Added labcode field
+
+
+    public String getLabcode() {
+		return labcode;
+	}
+
+	public void setLabcode(String labcode) {
+		this.labcode = labcode;
+	}
 
     public Long getId() {
         return id;

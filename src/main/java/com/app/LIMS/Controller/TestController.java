@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,7 +44,9 @@ public class TestController {
     @Autowired private UserRepository userRepo;
     
     @Autowired SampleRepository sampleRepo;
-   
+
+	 @Value("${labCode}")
+	 private String labCode;
     @Autowired
     private TestService testService;
 
@@ -159,6 +162,7 @@ public class TestController {
             sample.setNotes(req.getNotes());
             sample.setStatus("Pending");
             sample.setCreatedAt(LocalDateTime.now());
+            sample.setLabcode(labCode);
             testRepo.save(sample);
 
             
@@ -168,7 +172,7 @@ public class TestController {
             sC.setCollector(String.valueOf(req.getTestRaisedBy()));
             sC.setTests(testItem.getTestId());
             sC.setStatus("Pending");
-            
+            sC.setLabcode(labCode);
             sampleRepo.save(sC);
             sampleNumbers.add(sampleNumber);
             sampleIds.add(sample.getId());

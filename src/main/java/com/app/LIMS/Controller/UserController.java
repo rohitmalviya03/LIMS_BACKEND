@@ -39,7 +39,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<UserDTO> login(@RequestBody LoginRequest loginRequest) {
         return userService.authenticate(loginRequest.getUsername(), loginRequest.getPassword())
-                .map(user -> ResponseEntity.ok(new UserDTO(user.getId(), user.getUsername(), user.getRole(), user.getEmail())))
+                .map(user -> ResponseEntity.ok(new UserDTO(user.getId(), user.getUsername(), user.getRole(), user.getEmail(),user.getLabcode())))
                 .orElse(ResponseEntity.status(401).build());
     }
 
@@ -153,16 +153,18 @@ public class UserController {
 
 		private String role;
         private String email;
+        private String labCode;
 
         
         
         
         
-        public UserDTO(Integer id, String username, String role, String email) {
+        public UserDTO(Integer id, String username, String role, String email,String labCode) {
             this.id = id;
             this.username = username;
             this.role = role;
             this.email = email;
+            this.labCode=labCode;
         }
     }
 }

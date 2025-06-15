@@ -4,13 +4,16 @@ import java.util.List;
 
 import org.aspectj.weaver.ast.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.app.LIMS.Repository.TestSampleRepository;
 import com.app.LIMS.entity.TestSample;
 @Service
 public class TestService {
-	
+
+	 @Value("${labCode}")
+	    private String labCode;
     @Autowired
     private TestSampleRepository testRepository;
 

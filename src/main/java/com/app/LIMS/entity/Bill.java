@@ -77,8 +77,18 @@ public class Bill {
     private Double discountPercent;
     private Double taxPercent;
     private Double total;
+    @Column(nullable = true)
+    private String labcode; // <-- Added labcode field
 
-    @Lob
+
+    public String getLabcode() {
+		return labcode;
+	}
+
+	public void setLabcode(String labcode) {
+		this.labcode = labcode;
+	}
+	@Lob
     private String itemsJson; // Store items as JSON string
 
     // getters and setters

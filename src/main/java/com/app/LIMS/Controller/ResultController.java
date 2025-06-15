@@ -12,9 +12,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.app.LIMS.Repository.PatientRepository;
 import com.app.LIMS.Repository.ResultRepository;
 import com.app.LIMS.Repository.SampleRepository;
 import com.app.LIMS.Repository.TestSampleRepository;
+import com.app.LIMS.entity.Patient;
 import com.app.LIMS.entity.Result;
 import com.app.LIMS.entity.Sample;
 import com.app.LIMS.entity.TestSample;
@@ -29,11 +31,13 @@ public class ResultController {
     private SampleRepository sampleRepository;
     @Autowired
     private TestSampleRepository testRepository;
-
+    @Autowired
+    private PatientRepository patRepository;
     // DTO for UI entry
     public static class EntryRequest {
         public String sampleId;
         public Map<String, String> results;
+        public Long patId; // Add this field
         public String userId; // Add this field
     }
 
@@ -43,6 +47,16 @@ public class ResultController {
             return ResponseEntity.badRequest().body("Missing data");
         }
         Optional<Sample> sampleOpt = sampleRepository.findBySampleId(req.sampleId);
+        
+        
+        
+        Optional<Patient> patientOpt = patRepository.findById(req.patId);
+        if (!patientOpt.isPresent()) {
+            return ResponseEntity.badRequest().body("Patient not found");
+        }
+        String mrn = patientOpt.get().getMrn();
+
+        TestSample testSampleOpt = testRepository.findBySampleNumber(req.sampleId);
         if (!sampleOpt.isPresent()) return ResponseEntity.badRequest().body("Sample not found");
 
         req.results.forEach((key, value) -> {
@@ -66,9 +80,14 @@ public class ResultController {
                 result.setEnterdAt(LocalDateTime.now());
                 result.setEnteredBy(req.userId);
                 result.setValidationStatus("pending");
+                result.setPatMrn(Long.parseLong(mrn));
                 
                 
                 resultRepository.save(result);
+                
+                TestSample objTestSam=   testOpt.get();
+                objTestSam.setStatus("Completed");
+                testRepository.save(objTestSam);
             }
         });
 
@@ -76,6 +95,10 @@ public class ResultController {
         Sample sample = sampleOpt.get();
         sample.setStatus("result_entered");
         sampleRepository.save(sample);
+        
+        
+        
+        
 
         return ResponseEntity.ok().body("Results saved");
     }
@@ -96,6 +119,7 @@ public class ResultController {
         public LocalDateTime enteredAt;
         public String validationStatus;
         public String validatedBy;
+        public Long patMrn;
         public LocalDateTime validatedAt;
 
         public static ResultDTO fromEntity(Result r) {
@@ -110,6 +134,7 @@ public class ResultController {
             dto.validationStatus = r.getValidationStatus();
             dto.validatedBy = r.getValidatedBy();
             dto.validatedAt = r.getValidatedAt();
+            dto.patMrn=r.getPatMrn();
             return dto;
         }
     }
@@ -119,6 +144,7 @@ public class ResultController {
         public Long resultId;
         public String status; // "approved" or "rejected"
         public String doctorId;
+        public String sampleId;
     }
 
     @PostMapping("/validate")
@@ -129,10 +155,19 @@ public class ResultController {
         result.setValidationStatus(req.status);
         result.setValidatedBy(req.doctorId);
         result.setValidatedAt(LocalDateTime.now());
+
+        
+       Optional<Sample> sam= sampleRepository.findBySampleId(req.sampleId);
+       Sample sd=sam.get();
+sd.setStatus("Collected");
+sampleRepository.save(sd);        // If rejected, set entryStatus to "pending" (or "editable")
+        if ("rejected".equalsIgnoreCase(req.status)) {
+           // result.setValidationStatus(""); // Make sure this field exists in your entity
+        }
+
         resultRepository.save(result);
         return ResponseEntity.ok().body("Result " + req.status);
     }
-    
     
     @GetMapping("/report")
     public ResponseEntity<?> getReport(

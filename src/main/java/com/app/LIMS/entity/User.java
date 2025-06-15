@@ -28,7 +28,17 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "UserID")
     private Integer id;
+    @Column(nullable = true)
+    private String labcode; // <-- Added labcode field
 
+
+    public String getLabcode() {
+		return labcode;
+	}
+
+	public void setLabcode(String labcode) {
+		this.labcode = labcode;
+	}
     @Column(name = "username", unique = true)
     private String username;
 

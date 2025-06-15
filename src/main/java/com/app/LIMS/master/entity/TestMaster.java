@@ -26,7 +26,17 @@ public class TestMaster {
     public SampleMaster getSample() {
 		return sample;
 	}
+    @Column(nullable = true)
+    private String labcode; // <-- Added labcode field
 
+
+    public String getLabcode() {
+		return labcode;
+	}
+
+	public void setLabcode(String labcode) {
+		this.labcode = labcode;
+	}
 	public void setSample(SampleMaster sample) {
 		this.sample = sample;
 	}

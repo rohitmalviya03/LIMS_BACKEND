@@ -128,6 +128,19 @@ public class Patient {
     private String idProof;
     private String emergencyContact;
     private String status = "Active"; // Default
+    
+    
+    @Column(nullable = true)
+    private String labcode; // <-- Added labcode field
+
+
+    public String getLabcode() {
+		return labcode;
+	}
+
+	public void setLabcode(String labcode) {
+		this.labcode = labcode;
+	}
 
     private LocalDate registrationDate = LocalDate.now();
 }

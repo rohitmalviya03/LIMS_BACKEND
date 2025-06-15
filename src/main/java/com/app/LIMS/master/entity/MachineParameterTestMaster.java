@@ -42,7 +42,17 @@ public class MachineParameterTestMaster {
 	public void setParameter(String parameter) {
 		this.parameter = parameter;
 	}
+    @Column(nullable = true)
+    private String labcode; // <-- Added labcode field
 
+
+    public String getLabcode() {
+		return labcode;
+	}
+
+	public void setLabcode(String labcode) {
+		this.labcode = labcode;
+	}
 	@ManyToOne
     private TestMaster test;
 

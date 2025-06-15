@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import com.app.LIMS.entity.Result;
 
@@ -28,4 +29,8 @@ public interface ResultRepository extends JpaRepository<Result, Long> {
          @Param("sampleId") String sampleId,
          @Param("entryDate") LocalDate entryDate
      );
+
+    	
+
+
 }

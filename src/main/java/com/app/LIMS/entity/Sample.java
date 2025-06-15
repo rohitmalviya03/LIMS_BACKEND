@@ -83,7 +83,17 @@ public class Sample {
 	private Long patientId;
     private String patientName;
 
-   
+    @Column(nullable = true)
+    private String labcode; // <-- Added labcode field
+
+
+    public String getLabcode() {
+		return labcode;
+	}
+
+	public void setLabcode(String labcode) {
+		this.labcode = labcode;
+	}
     private String tests;
 
     private String status; // "pending" or "collected"
