@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import com.app.LIMS.Repository.UserRepository;
 import com.app.LIMS.entity.User;
 import com.app.LIMS.entity.UserRequest;
+import com.app.LIMS.master.Repository.LabRepository;
+import com.app.LIMS.master.entity.Lab;
 
 import java.util.Optional;
 
@@ -21,22 +23,44 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private LabRepository labRepo;
 
 
 	 	@Value("${labCode}")
 	    private String labCode;
-    public Optional<User> authenticate(String username, String rawPassword) {
-        Optional<User> userOpt = userRepository.findByUsername(username);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            System.out.println("Raw password: " + rawPassword);
-            System.out.println("DB hash: " + user.getPasswordHash());
-            boolean matches = passwordEncoder.matches(rawPassword, user.getPasswordHash());
-            System.out.println("Password matches: " + matches);
-            if (matches) {
-                return Optional.of(user);
-            }
-        }
+    public Optional<?> authenticate(String username, String rawPassword,String userType) {
+    	  Optional<User> userOpt = java.util.Optional.empty();
+    	  Optional<Lab> labOpt;
+    	 if ("user".equalsIgnoreCase(userType)) {
+    		 userOpt= userRepository.findByUsername(username);
+    		   if (userOpt.isPresent()) {
+    	            User user = userOpt.get();
+    	            System.out.println("Raw password: " + rawPassword);
+    	            System.out.println("DB hash: " + user.getPasswordHash());
+    	            boolean matches = passwordEncoder.matches(rawPassword, user.getPasswordHash());
+    	            System.out.println("Password matches: " + matches);
+    	            if (matches) {
+    	                return Optional.of(user);
+    	            }
+    	        }
+    	 }
+    	 else {
+    		 labOpt=labRepo.findByLabCode(username);
+    		 
+    		   if (labOpt.isPresent()) {
+    	            Lab lab = labOpt.get();
+    	            System.out.println("Raw password: " + rawPassword);
+    	            System.out.println("DB hash: " + lab.getPassword());
+    	            boolean matches = passwordEncoder.matches(rawPassword, lab.getPassword());
+    	            System.out.println("Password matches: " + matches);
+    	            if (matches) {
+    	                return Optional.of(lab);
+    	            }
+    	        }
+    	 }
+     
         return Optional.empty();
     }
     

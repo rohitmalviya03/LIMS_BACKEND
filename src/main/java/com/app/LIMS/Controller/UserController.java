@@ -5,8 +5,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +19,7 @@ import com.app.LIMS.Repository.UserRepository;
 import com.app.LIMS.Services.UserService;
 import com.app.LIMS.entity.User;
 import com.app.LIMS.entity.UserRequest;
+import com.app.LIMS.master.entity.Lab;
 
 import lombok.Data;
 import lombok.Getter;
@@ -37,20 +41,31 @@ public class UserController {
     
     
     @PostMapping("/login")
-    public ResponseEntity<UserDTO> login(@RequestBody LoginRequest loginRequest) {
-        return userService.authenticate(loginRequest.getUsername(), loginRequest.getPassword())
-                .map(user -> ResponseEntity.ok(new UserDTO(user.getId(), user.getUsername(), user.getRole(), user.getEmail(),user.getLabcode())))
-                .orElse(ResponseEntity.status(401).build());
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        if (loginRequest.getUserType().equalsIgnoreCase("user")) {
+            return userService.authenticate(loginRequest.getUsername(), loginRequest.getPassword(), loginRequest.getUserType())
+                    .map(user -> {
+                        User u = (User) user;
+                        return ResponseEntity.ok(new UserDTO(u.getId(), u.getUsername(), u.getRole(), u.getEmail(), u.getLabcode()));
+                    })
+                    .orElse(ResponseEntity.status(401).build());
+        } else {
+            return userService.authenticate(loginRequest.getUsername(), loginRequest.getPassword(), loginRequest.getUserType())
+                    .map(lab -> {
+                        Lab l = (Lab) lab;  // ✅ cast to Lab entity
+                        return ResponseEntity.ok(new LabDtO(l.getId(), l.getLabCode(), "lab", l.getStatus(), l.getLabCode()));
+                    })
+                    .orElse(ResponseEntity.status(401).build());
+        }
     }
 
     
-    
 
-    @GetMapping("/users-master")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userRepo.findAll();
+    @GetMapping("/users-master/{labCode}")
+    public ResponseEntity<List<User>> getAllUsers(@PathVariable String labCode) {
+        List<User> users = userRepo.findByLabCode(labCode);
         List<User> dtos = users.stream()
-            .map(u -> new User(u.getId(),u.getUsername(),u.getRole()))
+            .map(u -> new User(u.getId(),u.getUsername(),u.getRole(),u.getEmail()))
             .toList();
         return ResponseEntity.ok(dtos);
     }
@@ -65,11 +80,53 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+   
+   
+   
+   
+   
+   
+   
+   
+   // Edit user (User Master)
+   @PutMapping("/user-master/update")
+   public ResponseEntity<?> updateUserMaster(@RequestBody UserRequest userRequest) {
+       try {
+           User updatedUser = userService.updateUser(userRequest);
+           return ResponseEntity.ok(new UserDTO(updatedUser.getId(), updatedUser.getUsername(), updatedUser.getRole(), updatedUser.getEmail(), updatedUser.getLabcode()));
+       } catch (Exception e) {
+           return ResponseEntity.badRequest().body(e.getMessage());
+       }
+   }
+
+   // Delete user (User Master)
+   @DeleteMapping("/user-master/delete")
+   public ResponseEntity<?> deleteUserMaster(@RequestParam Integer userId) {
+       try {
+           userService.deleteUser(userId);
+           return ResponseEntity.ok("User deleted successfully");
+       } catch (Exception e) {
+           return ResponseEntity.badRequest().body(e.getMessage());
+       }
+   }
+
+   // (Optional) Track user activity
+   @GetMapping("/user-master/activity")
+   public ResponseEntity<List<String>> getUserActivity(@RequestParam Integer userId) {
+       List<String> activity = userService.getUserActivity(userId); // Implement this in your service
+       return ResponseEntity.ok(activity);
+   }
     static class LoginRequest {
         private String username;
         private String password;
-        
-        public String getUsername() {
+        private String userType;
+        public String getUserType() {
+			return userType;
+		}
+		public void setUserType(String userType) {
+			this.userType = userType;
+		}
+		public String getUsername() {
             return username;
         }
         public void setUsername(String username) {
@@ -164,7 +221,114 @@ public class UserController {
             this.username = username;
             this.role = role;
             this.email = email;
+            this.setLabCode(labCode);
+        }
+
+
+
+
+
+		public String getLabCode() {
+			return labCode;
+		}
+
+
+
+
+
+		public void setLabCode(String labCode) {
+			this.labCode = labCode;
+		}
+        
+
+     
+    }
+    
+    	static class LabDtO {
+        private Integer id;
+        
+        private String username;
+        public Integer getId() {
+			return id;
+		}
+
+
+
+
+
+		public void setId(Integer id) {
+			this.id = id;
+		}
+
+
+
+
+
+		public String getUsername() {
+			return username;
+		}
+
+
+
+
+
+		public void setUsername(String username) {
+			this.username = username;
+		}
+
+
+
+
+
+		public String getRole() {
+			return role;
+		}
+
+
+
+
+
+		public void setRole(String role) {
+			this.role = role;
+		}
+
+
+
+
+
+		public String getEmail() {
+			return email;
+		}
+
+
+
+
+
+		public void setEmail(String email) {
+			this.email = email;
+		}
+
+
+
+
+
+		private String role;
+        private String email;
+        private String labCode;
+
+        
+        
+        
+        
+        public LabDtO(Long long1, String username, String role, String email,String labCode) {
+            this.id = id;
+            this.username = username;
+            this.role = role;
+            this.email = email;
             this.labCode=labCode;
         }
+        
+
+     
     }
 }
