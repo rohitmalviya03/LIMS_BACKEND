@@ -63,7 +63,7 @@ public class UserController {
 
     @GetMapping("/users-master/{labCode}")
     public ResponseEntity<List<User>> getAllUsers(@PathVariable String labCode) {
-        List<User> users = userRepo.findByLabCode(labCode);
+        List<User> users = userRepo.findByLabcode(labCode);
         List<User> dtos = users.stream()
             .map(u -> new User(u.getId(),u.getUsername(),u.getRole(),u.getEmail()))
             .toList();
@@ -89,7 +89,7 @@ public class UserController {
    
    
    // Edit user (User Master)
-   @PutMapping("/user-master/update")
+   @PostMapping("/user-master/update")
    public ResponseEntity<?> updateUserMaster(@RequestBody UserRequest userRequest) {
        try {
            User updatedUser = userService.updateUser(userRequest);

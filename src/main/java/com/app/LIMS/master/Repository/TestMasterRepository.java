@@ -11,4 +11,8 @@ public interface TestMasterRepository extends JpaRepository<TestMaster, Long> {
     List<TestMaster> findAll();
     
     Optional<TestMaster> findByTestNameIgnoreCase(String testName);
+
+	boolean existsByTestNameAndSampleType(String testName, String sampleType);
+
+	List<TestMaster> findAllByLabcode(String labcode);
 }

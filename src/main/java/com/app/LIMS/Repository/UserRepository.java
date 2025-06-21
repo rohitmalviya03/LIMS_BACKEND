@@ -1,5 +1,6 @@
 package com.app.LIMS.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,5 +15,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     boolean existsByUsername(String username);
     User findById(Long id);
     Optional<User> findById(Integer id);
+	List<User> findByLabcode(String labCode);
+	Optional<User> findByIdAndLabcode(Long id, String labcode);
 }
 

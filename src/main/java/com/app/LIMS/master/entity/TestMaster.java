@@ -1,11 +1,15 @@
 package com.app.LIMS.master.entity;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -23,7 +27,16 @@ public class TestMaster {
     private SampleMaster sample; // Reference to Sample Master
 
 
-    public SampleMaster getSample() {
+    private String sampleType;
+    public String getSampleType() {
+		return sampleType;
+	}
+
+	public void setSampleType(String sampleType) {
+		this.sampleType = sampleType;
+	}
+
+	public SampleMaster getSample() {
 		return sample;
 	}
     @Column(nullable = true)
@@ -68,4 +81,6 @@ public class TestMaster {
     public void setPrice(Double price) {
         this.price = price;
     }
+    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MachineParameterTestMaster> machineParameterTests;
 }

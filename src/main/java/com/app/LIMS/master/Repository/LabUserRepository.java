@@ -13,5 +13,5 @@ import java.util.Optional;
 public interface LabUserRepository extends JpaRepository<LabUser, Long> {
     Optional<LabUser> findByEmailAndLab(String email, Lab lab);
 
-	List<LabUser> findByLab(Long labId);
+	//List<LabUser> findByLab(Long labId);
 }

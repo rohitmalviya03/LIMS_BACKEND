@@ -13,11 +13,12 @@ import java.time.LocalDateTime;
 @Setter
 @Table(name = "users")
 public class User {
-    public User(Integer id, String username, String role) {
+    public User(Integer id, String username, String role,String Email) {
 		super();
 		this.id = id;
 		this.username = username;
 		this.role = role;
+		this.email=Email;
 	}
 
 	public User() {

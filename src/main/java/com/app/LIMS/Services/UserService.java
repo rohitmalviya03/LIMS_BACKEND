@@ -1,5 +1,7 @@
 package com.app.LIMS.Services;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,8 +74,46 @@ public class UserService {
         user.setPasswordHash(passwordEncoder.encode(userRequest.getPassword()));
         user.setEmail(userRequest.getEmail());
         user.setRole(userRequest.getRole());
+        
         return userRepository.save(user);
     }
     
+    
+    // Update user (User Master)
+    public User updateUser(UserRequest userRequest) {
+        Optional<User> userOpt = userRepository.findByIdAndLabcode(userRequest.getId(),userRequest.getLabcode());
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setUsername(userRequest.getUsername());
+            user.setEmail(userRequest.getEmail());
+            user.setRole(userRequest.getRole());
+            user.setLabcode(userRequest.getLabcode());
+            if (userRequest.getPassword() != null && !userRequest.getPassword().isEmpty()) {
+                user.setPasswordHash(passwordEncoder.encode(userRequest.getPassword()));
+            }
+            return userRepository.save(user);
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
+    // Delete user (User Master)
+    public void deleteUser(Integer userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("User not found");
+        }
+        userRepository.deleteById(userId);
+    }
+
+    // (Optional) Track user activity (stub implementation)
+    public List<String> getUserActivity(Integer userId) {
+        // Replace this with actual activity tracking logic
+        List<String> activity = new ArrayList<>();
+        activity.add("Logged in at 2025-06-19 10:00");
+        activity.add("Edited profile at 2025-06-19 10:15");
+        activity.add("Logged out at 2025-06-19 10:30");
+        return activity;
+    }
+
     
 }

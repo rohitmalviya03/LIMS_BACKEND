@@ -6,7 +6,14 @@ public class UserRequest {
     private String username;
     private String password;
     private String email;
-    private String role;
+    private  Long id;
+    public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	private String role;
 	public String getUsername() {
 		return username;
 	}
