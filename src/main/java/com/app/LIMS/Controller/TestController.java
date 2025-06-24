@@ -54,10 +54,11 @@ public class TestController {
     @GetMapping("/patients/search")
     public ResponseEntity<?> searchPatient(
         @RequestParam(required = false) String mrn,
-        @RequestParam(required = false) String name
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) String labcode
     ) {
         if (mrn != null) {
-            return patientRepo.findByMrn(mrn)
+            return patientRepo.findByMrnAndLabcode(mrn,labcode)
                 .map(ResponseEntity::ok) 
                 .orElseGet(() -> ResponseEntity.notFound().build());
         } 
@@ -105,9 +106,9 @@ public class TestController {
         return testService.getTestsByStatus(status);
     }
     @GetMapping("/tests/{id}")
-    public ResponseEntity<TestSample> getTestById(@PathVariable Long id) {
-        Optional<TestSample> test = testRepo.findById(id);
-        User ab= userRepo.findById(test.get().getCreatedBy());
+    public ResponseEntity<TestSample> getTestById(@PathVariable Long id,@RequestParam String labcode) {
+        Optional<TestSample> test = testRepo.findByIdAndLabcode(id,labcode);
+        User ab= userRepo.findByIdAndLabcode(test.get().getCreatedBy(),labcode);
         if(ab!=null) {
         test.get().setCreatebyUser(ab.getUsername());
         }
@@ -131,7 +132,7 @@ public class TestController {
     
     @PostMapping("/addtests/bulk")
     public ResponseEntity<?> raiseBulkTests(@RequestBody TestRaiseRequest req) {
-        Optional<Patient> patientOpt = patientRepo.findById(req.getPatientId());
+        Optional<Patient> patientOpt = patientRepo.findByIdAndLabcode(req.getPatientId(), req.labcode);
         if (!patientOpt.isPresent()) return ResponseEntity.status(404).body("Patient not found");
 
         // Prepare for sample number generation
@@ -157,12 +158,12 @@ public class TestController {
             Sample sC = new Sample();
             sample.setSampleNumber(sampleNumber);
             sample.setPatient(patientOpt.get());
-            sample.setTestName(testItem.getTestId());
+            sample.setTestId(Long.parseLong(testItem.getTestId()));
             sample.setCreatedBy(req.getTestRaisedBy());
             sample.setNotes(req.getNotes());
             sample.setStatus("Pending");
             sample.setCreatedAt(LocalDateTime.now());
-            sample.setLabcode(labCode);
+            sample.setLabcode(req.labcode);
             testRepo.save(sample);
 
             
@@ -172,7 +173,7 @@ public class TestController {
             sC.setCollector(String.valueOf(req.getTestRaisedBy()));
             sC.setTests(testItem.getTestId());
             sC.setStatus("Pending");
-            sC.setLabcode(labCode);
+            sC.setLabcode(req.labcode);
             sampleRepo.save(sC);
             sampleNumbers.add(sampleNumber);
             sampleIds.add(sample.getId());
@@ -206,15 +207,15 @@ public class TestController {
 	 * "Test updated successfully" )); }
 	 */
     @GetMapping("/raisedtests")
-    public ResponseEntity<?> getRaisedTests(@RequestParam Long patientId) {
-        List<TestSample> list = testRepo.findByPatientId(patientId);
+    public ResponseEntity<?> getRaisedTests(@RequestParam Long patientId,@RequestParam String labcode) {
+        List<TestSample> list = testRepo.findByPatientIdAndLabcode(patientId,labcode);
         return ResponseEntity.ok(list);
     }
 
     // Edit a raised test (test name, notes)
     @PutMapping("/raisedtests/{id}")
-    public ResponseEntity<?> editRaisedTest(@PathVariable Long id, @RequestBody TestRaiseRequest req) {
-        Optional<TestSample> sampleOpt = testRepo.findById(id);
+    public ResponseEntity<?> editRaisedTest(@PathVariable Long id,@RequestParam String labcode ,@RequestBody TestRaiseRequest req) {
+        Optional<TestSample> sampleOpt = testRepo.findByIdAndLabcode(id,labcode);
         if (sampleOpt.isEmpty()) return ResponseEntity.status(404).body("Sample not found");
 
         TestSample sample = sampleOpt.get();

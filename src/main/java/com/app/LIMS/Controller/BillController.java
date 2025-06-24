@@ -70,12 +70,13 @@ public class BillController {
         Bill bill = new Bill();
        // bill.setPatient(patientRepo.findById(patientId));
         
-        Patient patient = patientRepo.findById(patientId)
+        Patient patient = patientRepo.findByIdAndLabcode(patientId,String.valueOf(payload.get("labcode")))
         	    .orElseThrow(() -> new RuntimeException("Patient not found"));
         	bill.setPatient(patient);
         bill.setDiscountPercent(discountPercent);
         bill.setTaxPercent(taxPercent);
         bill.setTotal(total);
+        bill.setLabcode(String.valueOf(payload.get("labcode")));
         try {
             bill.setItemsJson(objectMapper.writeValueAsString(items));
         } catch (Exception ignored) {}
@@ -84,9 +85,9 @@ public class BillController {
     }
 
     @GetMapping("/history")
-    public List<Bill> getBills(@RequestParam Long patientId) {
-        Patient patient = patientRepo.findById(patientId).orElse(null);
-        return billRepo.findByPatient(patient);
+    public List<Bill> getBills(@RequestParam Long patientId, @RequestParam String labcode) {
+        Patient patient = patientRepo.findByIdAndLabcode(patientId,labcode).orElse(null);
+        return billRepo.findByPatientAndLabcode(patient,labcode);
     }
     
     //payment

@@ -1,5 +1,7 @@
 package com.app.LIMS.Services;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,9 +76,29 @@ public class PatientService {
     // Create patient (labcode should be set in Patient object)
     public Patient createPatient(Patient patient) {
         if (patient.getLabcode() == null) throw new RuntimeException("Labcode required");
+        
+        String labcode = patient.getLabcode();
+        String datePart = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMM"));
+        String mrnPrefix = labcode + datePart;
+
+        // Get the max MRN for this lab and date
+        String lastMrn = patientRepository.findMaxMrnByPrefix(mrnPrefix);
+
+        int nextCounter = 1;
+        if (lastMrn != null && lastMrn.length() > mrnPrefix.length()) {
+            String counterPart = lastMrn.substring(mrnPrefix.length());
+            try {
+                nextCounter = Integer.parseInt(counterPart) + 1;
+            } catch (NumberFormatException e) {
+                // Log or handle parsing issue gracefully
+                nextCounter = 1;
+            }
+        }
+
+        String newMrn = mrnPrefix + String.format("%02d", nextCounter);
         Integer maxMrn = patientRepository.findMaxMrnByLabcode(patient.getLabcode());
         int nextMrn = (maxMrn == null) ? 1 : maxMrn + 1;
-        patient.setMrn(String.valueOf(nextMrn));
+        patient.setMrn(String.valueOf(newMrn));
         return patientRepository.save(patient);
     }
 

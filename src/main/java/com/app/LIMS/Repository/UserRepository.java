@@ -16,6 +16,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     User findById(Long id);
     Optional<User> findById(Integer id);
 	List<User> findByLabcode(String labCode);
-	Optional<User> findByIdAndLabcode(Long id, String labcode);
+	User findByIdAndLabcode(Long id, String labcode);
 }
 

@@ -4,8 +4,15 @@ import java.util.List;
 
 public class TestRaiseRequest {
     private Long patientId;
-    private Long testRaisedBy;
+    public String getLabcode() {
+		return labcode;
+	}
+	public void setLabcode(String labcode) {
+		this.labcode = labcode;
+	}
+	private Long testRaisedBy;
     private String testName;
+    public String labcode;
     private String notes; 
     private List<TestItem> tests;
     // getters/setters

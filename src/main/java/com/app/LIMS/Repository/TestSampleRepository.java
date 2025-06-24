@@ -23,5 +23,8 @@ List<TestSample> findAllById(Iterable<Long> ids);
 
 List<TestSample> findByStatusIgnoreCaseAndLabcode(String status, String labcode);
 List<TestSample> findAllByIdInAndLabcode(List<Long> ids, String labcode);
+List<TestSample> findByPatientIdAndLabcode(Long patientId,String labcode);
+Optional<TestSample> findByIdAndLabcode(Long id, String labcode);
+List<TestSample> findByStatusAndLabcodeIgnoreCase(String string,String labcode);
 
 }

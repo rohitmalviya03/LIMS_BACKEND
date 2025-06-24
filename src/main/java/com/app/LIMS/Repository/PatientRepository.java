@@ -24,5 +24,8 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 	long countByLabcode(String labcode);
 	@Query("SELECT MAX(p.mrn) FROM Patient p WHERE p.labcode = :labcode")
 	Integer findMaxMrnByLabcode(@Param("labcode") String labcode);
+	 @Query("SELECT MAX(p.mrn) FROM Patient p WHERE p.mrn LIKE CONCAT(:prefix, '%')")
+	    String findMaxMrnByPrefix(@Param("prefix") String prefix);
+	Optional<Patient> findByMrnAndLabcode(String mrn,String labcode);
    
 }

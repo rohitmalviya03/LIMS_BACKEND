@@ -34,9 +34,9 @@ public class SampleController {
     private SampleRepository sampletesrepo;
 
     @GetMapping("/pending")
-    public List<TestSample> getPendingSamples() {
+    public List<TestSample> getPendingSamples(@RequestParam String labcode) {
     	
-    	return sampleRepo.findByStatusIgnoreCase("Pending");
+    	return sampleRepo.findByStatusAndLabcodeIgnoreCase("Pending",labcode);
        // return sampleService.getPendingSamples();
     }
 

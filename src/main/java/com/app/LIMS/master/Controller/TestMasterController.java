@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.LIMS.master.Repository.TestMasterRepository;
@@ -24,8 +25,8 @@ public class TestMasterController {
 
     // Get all test masters
     @GetMapping
-    public List<TestMaster> getAllTests() {
-        return testMasterRepository.findAll();
+    public List<TestMaster> getAllTests(@RequestParam String labcode) {
+        return testMasterRepository.findAllByLabcode(labcode);
     }
 
     // Add new test to master table
