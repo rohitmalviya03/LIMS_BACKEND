@@ -35,8 +35,8 @@ public class SampleController {
 
     @GetMapping("/pending")
     public List<TestSample> getPendingSamples(@RequestParam String labcode) {
-    	
-    	return sampleRepo.findByStatusAndLabcodeIgnoreCase("Pending",labcode);
+    	 List<String> statuses = List.of("Pending", "Re-collect");
+    	    return sampleRepo.findByStatusInAndLabcodeIgnoreCase(statuses, labcode);
        // return sampleService.getPendingSamples();
     }
 
@@ -97,10 +97,10 @@ public class SampleController {
         public void setStatus(String status) { this.status = status; }
     }
     @GetMapping("/count")
-    public  Map<String, Long> getTestCounts() {
+    public  Map<String, Long> getTestCounts(@RequestParam String labcode) {
        // Map<String, Long> counts = new HashMap<>();
     	Map<String, Long> counts = new HashMap<>();
-        counts.put("all", sampletesrepo.count());
+        counts.put("all", sampletesrepo.countByLabcode(labcode));
         counts.put("pending", sampletesrepo.countByStatusIgnoreCase("pending"));
         counts.put("completed", sampletesrepo.countByStatusIgnoreCase("completed"));
         counts.put("collected", sampletesrepo.countByStatusIgnoreCase("collected"));

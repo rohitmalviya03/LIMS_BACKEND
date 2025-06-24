@@ -38,7 +38,7 @@ public class SampleService {
         
         
         TestSample testSam= testrepo.findBySampleNumber(sampleId);
-        testSam.setStatus("collected");
+        testSam.setStatus("running");
         testrepo.save(testSam);
         
         return sampleRepository.save(sample);

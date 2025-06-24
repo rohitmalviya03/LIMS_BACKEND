@@ -36,6 +36,7 @@ public class ResultController {
     // DTO for UI entry
     public static class EntryRequest {
         public String sampleId;
+        public String labcode;
         public Map<String, String> results;
         public Long patId; // Add this field
         public String userId; // Add this field
@@ -46,17 +47,17 @@ public class ResultController {
         if (req.sampleId == null || req.results == null) {
             return ResponseEntity.badRequest().body("Missing data");
         }
-        Optional<Sample> sampleOpt = sampleRepository.findBySampleId(req.sampleId);
+        Optional<Sample> sampleOpt = sampleRepository.findBySampleIdAndLabcode(req.sampleId,req.labcode);
         
         
         
-        Optional<Patient> patientOpt = patRepository.findById(req.patId);
+        Optional<Patient> patientOpt = patRepository.findByIdAndLabcode(sampleOpt.get().getPatientId(),req.labcode);
         if (!patientOpt.isPresent()) {
             return ResponseEntity.badRequest().body("Patient not found");
         }
         String mrn = patientOpt.get().getMrn();
 
-        TestSample testSampleOpt = testRepository.findBySampleNumber(req.sampleId);
+        TestSample testSampleOpt = testRepository.findBySampleNumberAndLabcode(req.sampleId,req.labcode);
         if (!sampleOpt.isPresent()) return ResponseEntity.badRequest().body("Sample not found");
 
         req.results.forEach((key, value) -> {
@@ -82,7 +83,7 @@ public class ResultController {
                 result.setValidationStatus("pending");
                 result.setPatMrn(Long.parseLong(mrn));
                 
-                
+                result.setLabcode(req.labcode);
                 resultRepository.save(result);
                 
                 TestSample objTestSam=   testOpt.get();
@@ -105,7 +106,7 @@ public class ResultController {
     
     
     @GetMapping("/pending-validation")
-    public List<ResultDTO> getPendingResults() {
+    public List<ResultDTO> getPendingResults(@RequestParam String labcode) {
         List<Result> results = resultRepository.findAllByValidationStatus("pending");
         return results.stream().map(ResultDTO::fromEntity).collect(Collectors.toList());
     }
@@ -145,22 +146,30 @@ public class ResultController {
         public String status; // "approved" or "rejected"
         public String doctorId;
         public String sampleId;
+        public String labCode;
     }
 
     @PostMapping("/validate")
     public ResponseEntity<?> validateResult(@RequestBody ValidateRequest req) {
-        Optional<Result> resultOpt = resultRepository.findById(req.resultId);
+        Optional<Result> resultOpt = resultRepository.findByIdAndLabcode(req.resultId,req.labCode);
         if (!resultOpt.isPresent()) return ResponseEntity.badRequest().body("Result not found");
         Result result = resultOpt.get();
-        result.setValidationStatus(req.status);
+        result.setValidationStatus("validated");
         result.setValidatedBy(req.doctorId);
         result.setValidatedAt(LocalDateTime.now());
 
         
-       Optional<Sample> sam= sampleRepository.findBySampleId(req.sampleId);
+       Optional<Sample> sam= sampleRepository.findBySampleIdAndLabcode(req.sampleId,req.labCode);
+       
+       Optional<TestSample> testsam= Optional.ofNullable(testRepository.findBySampleNumberAndLabcode(req.sampleId,req.labCode));
        Sample sd=sam.get();
-sd.setStatus("Collected");
-sampleRepository.save(sd);        // If rejected, set entryStatus to "pending" (or "editable")
+       sd.setStatus("completed");
+       
+       TestSample sv=  testsam.get();
+       sv.setStatus("completed");
+       
+       testRepository.save(sv);
+       sampleRepository.save(sd);        // If rejected, set entryStatus to "pending" (or "editable")
         if ("rejected".equalsIgnoreCase(req.status)) {
            // result.setValidationStatus(""); // Make sure this field exists in your entity
         }
@@ -172,12 +181,13 @@ sampleRepository.save(sd);        // If rejected, set entryStatus to "pending" (
     @GetMapping("/report")
     public ResponseEntity<?> getReport(
         @RequestParam String sampleId,
-        @RequestParam Long testId
+        @RequestParam Long testId,
+        @RequestParam String labcode
     ) {
         // Fetch only approved results for this sample and test
         List<Result> results = resultRepository
-            .findAllBySample_SampleIdAndTest_IdAndValidationStatus(
-                sampleId, testId, "approved"
+            .findAllBySample_SampleIdAndTest_IdAndValidationStatusAndLabcode(
+                sampleId, testId, "validated",labcode
             );
         if (results.isEmpty()) {
             return ResponseEntity.badRequest().body("No approved results found.");

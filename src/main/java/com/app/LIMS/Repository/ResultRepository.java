@@ -15,8 +15,8 @@ public interface ResultRepository extends JpaRepository<Result, Long> {
     Optional<Result> findBySampleIdAndTestId(Long sampleId, Long testId);
     Optional<Result> findBySample_SampleIdAndTest_IdAndParameter(String sampleId, Long testId, String parameter);
     
-    List<Result> findAllBySample_SampleIdAndTest_IdAndValidationStatus(
-    	    String sampleId, Long testId, String validationStatus
+    List<Result> findAllBySample_SampleIdAndTest_IdAndValidationStatusAndLabcode(
+    	    String sampleId, Long testId, String validationStatus,String labcode
     	);
 
     List<Result> findAllByValidationStatus(String validationStatus);
@@ -29,6 +29,8 @@ public interface ResultRepository extends JpaRepository<Result, Long> {
          @Param("sampleId") String sampleId,
          @Param("entryDate") LocalDate entryDate
      );
+	List<Result> findAllByValidationStatusAndLabcode(String string,String labcode);
+	Optional<Result> findByIdAndLabcode(Long resultId, String labcode);
 
     	
 

@@ -120,9 +120,9 @@ public class TestController {
     
     
     @GetMapping("/tests/count")
-    public Map<String, Long> getTestCounts() {
+    public Map<String, Long> getTestCounts(@RequestParam String labcode) {
         Map<String, Long> counts = new HashMap<>();
-        counts.put("all", testRepo.count());
+        counts.put("all", testRepo.countByLabcode(labcode));
         counts.put("pending", testRepo.countByStatusIgnoreCase("pending"));
         counts.put("completed", testRepo.countByStatusIgnoreCase("completed"));
         counts.put("collected", testRepo.countByStatusIgnoreCase("collected"));
