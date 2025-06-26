@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/masters")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = "https://lims-backend-2bc1.onrender.com", allowCredentials = "true")
 public class MasterController {
 
     @Autowired private TestMasterRepository testRepo;

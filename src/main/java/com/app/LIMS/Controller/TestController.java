@@ -36,7 +36,7 @@ import com.app.LIMS.entity.User;
 import com.app.LIMS.entity.TestSample;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = "https://lims-backend-2bc1.onrender.com", allowCredentials = "true")
 @RequestMapping("/api")
 public class TestController {
     @Autowired private PatientRepository patientRepo;

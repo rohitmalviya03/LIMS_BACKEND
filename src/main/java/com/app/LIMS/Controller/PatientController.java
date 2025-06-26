@@ -12,7 +12,7 @@ import com.app.LIMS.entity.Patient;
 
 @RestController
 @RequestMapping("/api/patients")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = "https://lims-backend-2bc1.onrender.com", allowCredentials = "true")
 public class PatientController {
 
     @Autowired
