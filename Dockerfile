@@ -6,7 +6,7 @@ WORKDIR /LIMS_BACKEND
 
 
 COPY pom.xml .
-COPY ./ ./src
+COPY ./ /LIMS_BACKEND/src
 RUN mvn dependency:go-offline
 
 RUN mvn clean package -DskipTests
