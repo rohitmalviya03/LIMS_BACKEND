@@ -126,6 +126,10 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				
+      <configuration>
+        <mainClass>com.app.LIMS.LimsApplication</mainClass>
+      </configuration>
 			</plugin>
 		</plugins>
 	</build>
