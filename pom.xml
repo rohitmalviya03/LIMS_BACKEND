@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.0</version>
+		<version>3.5.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.LIMS</groupId>
@@ -35,13 +35,11 @@
 <dependency>
     <groupId>org.springframework.security</groupId>
     <artifactId>spring-security-web</artifactId>
-    <version>6.4.5</version>
 </dependency>
 	<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-config -->
 <dependency>
     <groupId>org.springframework.security</groupId>
     <artifactId>spring-security-config</artifactId>
-    <version>6.4.6</version>
 </dependency>
 	
 		<dependency>
@@ -88,7 +86,6 @@
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
-            <version>3.1.0</version>
         </dependency>
 
         <!-- Spring Boot DevTools (optional, for live reload in development) -->
@@ -128,7 +125,8 @@
       <artifactId>spring-boot-maven-plugin</artifactId>
       <version>3.5.0</version>
       <configuration>
-        <mainClass>com.app.LIMS.LimsApplication</mainClass>
+       <mainClass>com.LIMS.LimsApplication</mainClass>
+</mainClass>
       </configuration>
     </plugin>
   </plugins>
