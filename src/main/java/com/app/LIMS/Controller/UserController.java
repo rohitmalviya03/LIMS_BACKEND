@@ -36,8 +36,10 @@ public class UserController {
     @Autowired
     private UserRepository userRepo;
     
-
-    
+    @GetMapping
+    public String  welcome() {
+    return "hello";	
+    }
     
     
     @PostMapping("/login")
