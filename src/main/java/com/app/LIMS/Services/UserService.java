@@ -81,7 +81,7 @@ public class UserService {
     
     // Update user (User Master)
     public User updateUser(UserRequest userRequest) {
-        Optional<User> userOpt = userRepository.findByIdAndLabcode(userRequest.getId(),userRequest.getLabcode());
+        Optional<User> userOpt = Optional.ofNullable(userRepository.findByIdAndLabcode(userRequest.getId(),userRequest.getLabcode()));
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             user.setUsername(userRequest.getUsername());
