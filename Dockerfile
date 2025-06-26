@@ -20,4 +20,4 @@ COPY --from=build /LIMS_BACKEND/target/*.jar LIMS-0.0.1-SNAPSHOT.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "LIMS-0.0.1-SNAPSHOT.jar"]
