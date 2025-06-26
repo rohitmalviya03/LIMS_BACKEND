@@ -1,7 +1,7 @@
 # Use Maven image to build the app
 FROM maven:3.9.2-eclipse-temurin-17 AS build
 
-WORKDIR /app
+WORKDIR /LIMS_BACKEND
 
 COPY pom.xml .
 
@@ -16,7 +16,7 @@ FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /LIMS_BACKEND/target/*.jar LIMS-0.0.1-SNAPSHOT.jar
 
 EXPOSE 8080
 
