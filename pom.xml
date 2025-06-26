@@ -122,16 +122,17 @@
 	</dependencies>
 
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				
+  <plugins>
+    <plugin>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-maven-plugin</artifactId>
+      <version>3.5.0</version>
       <configuration>
-        <mainClass>com.app.LIMS</mainClass>
+        <mainClass>com.app.LIMS.LimsApplication</mainClass>
       </configuration>
-			</plugin>
-		</plugins>
-	</build>
+    </plugin>
+  </plugins>
+</build>
+
 
 </project>
