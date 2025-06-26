@@ -128,7 +128,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				
       <configuration>
-        <mainClass>com.app.LIMS.LimsApplication</mainClass>
+        <mainClass>com.app.LIMS</mainClass>
       </configuration>
 			</plugin>
 		</plugins>
