@@ -15,4 +15,9 @@ public interface TestMasterRepository extends JpaRepository<TestMaster, Long> {
 	boolean existsByTestNameAndSampleType(String testName, String sampleType);
 
 	List<TestMaster> findAllByLabcode(String labcode);
+
+	boolean existsByTestNameAndSampleTypeAndLabcode(String testName, String sampleType, String labcode);
+
+
+
 }

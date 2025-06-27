@@ -10,4 +10,6 @@ public interface MachineMasterRepository extends JpaRepository<MachineMaster, Lo
 
 	List<MachineMaster> findAllByLabcode(String labcode);
 
+	boolean existsByNameAndLabcode(String name, String labcode);
+
 }

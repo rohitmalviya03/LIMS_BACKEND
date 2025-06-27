@@ -15,7 +15,6 @@ import com.app.LIMS.master.service.LabService;
 
 @RestController
 @RequestMapping("/api/lab")
-@CrossOrigin(origins = "https://lims-backend-2bc1.onrender.com", allowCredentials = "true")
 public class LabController {
     @Autowired
     private LabService labService;

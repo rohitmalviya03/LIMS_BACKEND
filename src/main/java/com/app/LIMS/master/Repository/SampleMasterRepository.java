@@ -10,4 +10,6 @@ public interface SampleMasterRepository extends JpaRepository<SampleMaster, Long
 
 	List<SampleMaster> findAllByLabcode(String labcode);
 
+	boolean existsByTypeAndLabcode(String labcode, String type);
+
 }

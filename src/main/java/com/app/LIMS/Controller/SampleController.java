@@ -23,7 +23,6 @@ import java.util.function.Supplier;
 @RestController
 @RequestMapping("/api/samples")
 
-@CrossOrigin(origins = "https://limsapp.onrender.com/", allowCredentials = "true")
 public class SampleController {
 
     @Autowired

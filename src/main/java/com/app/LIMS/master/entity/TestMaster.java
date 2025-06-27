@@ -11,9 +11,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "test_master")
+@Table(name = "test_master",uniqueConstraints = {
+	    @UniqueConstraint(columnNames = {"sampleType", "labcode","testName"})
+	})
 public class TestMaster {
     @Id @GeneratedValue
     private Long id;

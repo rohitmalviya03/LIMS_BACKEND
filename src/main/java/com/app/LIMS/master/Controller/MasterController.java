@@ -5,16 +5,20 @@ import com.app.LIMS.master.Repository.*;
 import com.app.LIMS.master.entity.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/masters")
-@CrossOrigin(origins = "https://lims-backend-2bc1.onrender.com", allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class MasterController {
 
     @Autowired private TestMasterRepository testRepo;
@@ -35,13 +39,26 @@ public class MasterController {
     public Optional<TestMaster> getTests(@PathVariable Long id) { return testRepo.findById(id); }
 
     @PostMapping("/tests")
-    public ResponseEntity<?> addTest(@RequestBody TestMaster test) {
-        boolean exists = testRepo.existsByTestNameAndSampleType(test.getTestName(), test.getSampleType());
-        if (exists) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Test with this name and sample type already exists.");
-        }
+    public ResponseEntity<Map<String, Object>> addTest(@RequestBody TestMaster test) {
+        Map<String, Object> response = new HashMap<>();
+
+      
+try {
         TestMaster saved = testRepo.save(test);
-        return ResponseEntity.ok(saved);
+        response.put("success", true);
+        response.put("message", "Test added successfully.");
+        response.put("data", saved);
+        return ResponseEntity.ok(response);
+        
+    } catch (DataIntegrityViolationException e) {
+        response.put("success", false);
+        response.put("message", "A sample with the same labcode and type already exists.");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    } catch (Exception e) {
+        response.put("success", false);
+        response.put("message", "Something went wrong.");
+        return ResponseEntity.status(500).body(response);
+    }
     }
 
     @PutMapping("/tests/{id}")
@@ -61,9 +78,33 @@ public class MasterController {
         }
         return sampleRepo.findAll();
     }
-
     @PostMapping("/samples")
-    public SampleMaster addSample(@RequestBody SampleMaster sample) { return sampleRepo.save(sample); }
+    public ResponseEntity<Map<String, Object>> addSample(@RequestBody SampleMaster sample) {
+        Map<String, Object> response = new HashMap<>();
+        boolean exists = sampleRepo.existsByTypeAndLabcode( sample.getType(),sample.getLabcode());
+        
+        if (exists) {
+            response.put("success", false);
+            response.put("message", "Sample Type for this Lab already exists.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        }
+
+        try {
+            SampleMaster savedSample = sampleRepo.save(sample);
+            response.put("success", true);
+            response.put("message", "Sample added successfully.");
+            response.put("data", savedSample);
+            return ResponseEntity.ok(response);
+        } catch (DataIntegrityViolationException e) {
+            response.put("success", false);
+            response.put("message", "A sample with the same labcode and type already exists.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Something went wrong.");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
 
     @PutMapping("/samples/{id}")
     public SampleMaster updateSample(@PathVariable Long id, @RequestBody SampleMaster sample) {
@@ -84,7 +125,23 @@ public class MasterController {
     }
 
     @PostMapping("/machines")
-    public MachineMaster addMachine(@RequestBody MachineMaster machine) { return machineRepo.save(machine); }
+    public ResponseEntity<Map<String, Object>>  addMachine(@RequestBody MachineMaster machine) {
+    	   Map<String, Object> response = new HashMap<>();
+    	  boolean exists = machineRepo.existsByNameAndLabcode(machine.getName(),machine.getLabcode());
+    	   if (exists) {
+               response.put("success", false);
+               response.put("message", "Sample Type for this Lab already exists.");
+               return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+           }
+    	   machineRepo.save(machine); 
+    	   response.put("success", true);
+           response.put("message", "Sample added successfully.");
+           response.put("data", machine);
+           return ResponseEntity.ok(response);
+    	
+    
+    
+    }
 
     @PutMapping("/machines/{id}")
     public MachineMaster updateMachine(@PathVariable Long id, @RequestBody MachineMaster machine) {
@@ -114,7 +171,21 @@ public class MasterController {
     }
 
     @PostMapping("/machine-params")
-    public MachineParameterTestMaster addParam(@RequestBody MachineParameterTestMaster param) { return paramRepo.save(param); }
+    public ResponseEntity<Map<String, Object>>  addParam(@RequestBody MachineParameterTestMaster param) { 
+    	 Map<String, Object> response = new HashMap<>();
+    	 boolean exists = paramRepo.existsByParameterAndLabcodeAndTest(param.getParameter(),param.getLabcode(),param.getTest());
+  	   if (exists) {
+             response.put("success", false);
+             response.put("message", "Sample Type for this Lab already exists.");
+             return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+         }
+    	 paramRepo.save(param); 
+    	  response.put("success", true);
+          response.put("message", "Sample added successfully.");
+          response.put("data", param);
+          return ResponseEntity.ok(response);
+    
+    }
 
     @PutMapping("/machine-params/{id}")
     public MachineParameterTestMaster updateParam(@PathVariable Long id, @RequestBody MachineParameterTestMaster param) {

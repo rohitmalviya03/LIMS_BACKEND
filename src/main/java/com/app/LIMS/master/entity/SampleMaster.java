@@ -4,6 +4,9 @@ package com.app.LIMS.master.entity;
 import jakarta.persistence.*;
 
 @Entity
+@Table(uniqueConstraints = {
+	    @UniqueConstraint(columnNames = {"type", "labcode"})
+	})
 public class SampleMaster {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

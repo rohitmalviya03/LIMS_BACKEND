@@ -27,7 +27,6 @@ import lombok.Setter;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "https://limsapp.onrender.com/", allowCredentials = "true")
 public class UserController {
 
     @Autowired
