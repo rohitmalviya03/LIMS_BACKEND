@@ -1,5 +1,9 @@
 package com.app.LIMS.master.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -73,5 +77,45 @@ public class LabService {
     private Long getCurrentLabIdFromAuth() {
         // TODO: Implement logic to get current labId from security context
         return 1L; // For demo, always return 1
+    }
+    
+    // Get a Lab by ID
+    public Lab getLabById(Long id) {
+        Optional<Lab> lab = labRepository.findById(id);
+        return lab.orElse(null); // Return null if Lab is not found
+    }
+
+    // Update an existing Lab
+    public LabRegistrationResponse updateLab(Long id, LabRegistrationRequest request) {
+        Optional<Lab> optionalLab = labRepository.findById(id);
+        if (!optionalLab.isPresent()) {
+            return null; // Lab not found
+        }
+
+        Lab lab = optionalLab.get();
+        lab.setLabCode(request.getLabCode());
+        lab.setName(request.getName());
+      //  lab.setAddress(request.getAddress());
+        // Update other fields from request
+
+        lab = labRepository.save(lab);
+        return new LabRegistrationResponse(lab.getLabCode(), lab.getName());
+    }
+
+    // Delete a Lab by ID
+    public boolean deleteLab(Long id) {
+        Optional<Lab> optionalLab = labRepository.findById(id);
+        if (!optionalLab.isPresent()) {
+            return false; // Lab not found
+        }
+        labRepository.delete(optionalLab.get());
+        return true; // Successfully deleted
+    }
+    
+    public List<LabRegistrationResponse> getAllLabs() {
+        List<Lab> labs = labRepository.findAll(); // Get all labs from the database
+        return labs.stream()
+                   .map(lab -> new LabRegistrationResponse(lab.getLabCode(), lab.getName()))
+                   .collect(Collectors.toList());
     }
 }

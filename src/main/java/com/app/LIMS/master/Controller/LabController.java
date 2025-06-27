@@ -1,5 +1,6 @@
 package com.app.LIMS.master.Controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,63 @@ public class LabController {
             // Generic error - 500 Internal Server Error
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "An unexpected error occurred."));
+        }
+    }
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getLab(@PathVariable("id") Long id) {
+        try {
+            Lab lab = labService.getLabById(id);
+            if (lab == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                     .body(Map.of("error", "Lab not found"));
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(lab);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body(Map.of("error", "An unexpected error occurred."));
+        }
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateLab(@PathVariable("id") Long id, @RequestBody LabRegistrationRequest request) {
+        try {
+            LabRegistrationResponse updatedLab = labService.updateLab(id, request);
+            if (updatedLab == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                     .body(Map.of("error", "Lab not found"));
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(updatedLab);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                                 .body(Map.of("error", ex.getMessage()));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body(Map.of("error", "An unexpected error occurred."));
+        }
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteLab(@PathVariable("id") Long id) {
+        try {
+            boolean isDeleted = labService.deleteLab(id);
+            if (!isDeleted) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                     .body(Map.of("error", "Lab not found"));
+            }
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body(Map.of("error", "An unexpected error occurred."));
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllLabs() {
+        try {
+            List<LabRegistrationResponse> labs = labService.getAllLabs();
+            return ResponseEntity.status(HttpStatus.OK).body(labs);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body(Map.of("error", "An unexpected error occurred."));
         }
     }
 
