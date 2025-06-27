@@ -30,8 +30,6 @@ public class UserService {
     private LabRepository labRepo;
 
 
-	 	@Value("${labCode}")
-	    private String labCode;
     public Optional<?> authenticate(String username, String rawPassword,String userType) {
     	  Optional<User> userOpt = java.util.Optional.empty();
     	  Optional<Lab> labOpt;
