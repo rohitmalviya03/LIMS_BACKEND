@@ -1,6 +1,7 @@
 package com.app.LIMS.master.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -112,10 +113,16 @@ public class LabService {
         return true; // Successfully deleted
     }
     
-    public List<LabRegistrationResponse> getAllLabs() {
-        List<Lab> labs = labRepository.findAll(); // Get all labs from the database
+    public List<Map<String, String>> getAllLabs() {
+        // Get all labs from the database
+        List<Lab> labs = labRepository.findAll();
+        
+        // Create a list of maps where each map represents a lab's labCode and name
         return labs.stream()
-                   .map(lab -> new LabRegistrationResponse(lab.getLabCode(), lab.getName()))
+                   .map(lab -> Map.of(
+                       "labCode", lab.getLabCode(),
+"id",String.valueOf(lab.getId()),
+                       "name", lab.getName()))
                    .collect(Collectors.toList());
     }
 }

@@ -48,7 +48,7 @@ public class UserService {
     	 }
     	 else {
     		 labOpt=labRepo.findByLabCode(username);
-    		 
+    		
     		   if (labOpt.isPresent()) {
     	            Lab lab = labOpt.get();
     	            System.out.println("Raw password: " + rawPassword);

@@ -36,9 +36,9 @@ public class LabController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<?> getLab(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getLab(@PathVariable("id") String id) {
         try {
-            Lab lab = labService.getLabById(id);
+            Lab lab = labService.getLabById(Long.parseLong(id));
             if (lab == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                                      .body(Map.of("error", "Lab not found"));
@@ -50,9 +50,9 @@ public class LabController {
         }
     }
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateLab(@PathVariable("id") Long id, @RequestBody LabRegistrationRequest request) {
+    public ResponseEntity<?> updateLab(@PathVariable("id") String id, @RequestBody LabRegistrationRequest request) {
         try {
-            LabRegistrationResponse updatedLab = labService.updateLab(id, request);
+            LabRegistrationResponse updatedLab = labService.updateLab( Long.parseLong(id), request);
             if (updatedLab == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                                      .body(Map.of("error", "Lab not found"));
@@ -84,7 +84,7 @@ public class LabController {
     @GetMapping("/all")
     public ResponseEntity<?> getAllLabs() {
         try {
-            List<LabRegistrationResponse> labs = labService.getAllLabs();
+            List<Map<String, String>> labs = labService.getAllLabs();
             return ResponseEntity.status(HttpStatus.OK).body(labs);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

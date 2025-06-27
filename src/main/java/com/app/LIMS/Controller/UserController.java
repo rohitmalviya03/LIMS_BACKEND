@@ -1,8 +1,11 @@
 package com.app.LIMS.Controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,7 +47,15 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         if (loginRequest.getUserType().equalsIgnoreCase("user")) {
-            return userService.authenticate(loginRequest.getUsername(), loginRequest.getPassword(), loginRequest.getUserType())
+        	
+        	
+        	
+        
+        	
+        	return userService.authenticate(loginRequest.getUsername(),
+            		
+            		
+            		loginRequest.getPassword(), loginRequest.getUserType())
                     .map(user -> {
                         User u = (User) user;
                         return ResponseEntity.ok(new UserDTO(u.getId(), u.getUsername(), u.getRole(), u.getEmail(), u.getLabcode()));
@@ -73,13 +84,26 @@ public class UserController {
     
   
    @PostMapping("/add")
-    public ResponseEntity<?> addUser(@RequestBody UserRequest userRequest) {
-        try {
-            User createdUser = userService.addUser(userRequest);
-            return ResponseEntity.ok(createdUser);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public  ResponseEntity<Map<String, Object>> addUser(@RequestBody UserRequest userRequest) {
+	   Map<String, Object> response = new HashMap<>();
+		boolean exists=userRepo.existsByUsernameAndLabcode(userRequest.getUsername(),userRequest.getLabcode());
+        
+    	if(exists) {
+    		
+    		 response.put("success", false);
+             response.put("message", "User is already exists.");
+             return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    	}
+    	else {
+    		 try {
+    	            User createdUser = userService.addUser(userRequest);
+    	            return ResponseEntity.status(HttpStatus.OK).body(response);
+    	           // return ResponseEntity.ok(createdUser);
+    	        } catch (Exception e) {
+    	            return (ResponseEntity<Map<String, Object>>) ResponseEntity.badRequest();
+    	        }	
+    	}
+       
     }
    
    
@@ -121,7 +145,14 @@ public class UserController {
         private String username;
         private String password;
         private String userType;
-        public String getUserType() {
+        private String labcode;
+        public String getLabcode() {
+			return labcode;
+		}
+		public void setLabcode(String labcode) {
+			this.labcode = labcode;
+		}
+		public String getUserType() {
 			return userType;
 		}
 		public void setUserType(String userType) {
